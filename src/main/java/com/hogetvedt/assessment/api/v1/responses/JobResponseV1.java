@@ -5,6 +5,5 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.UUID;
 
 public record JobResponseV1(
-        @Schema(description = "Server-assigned Job ID", requiredMode = Schema.RequiredMode.REQUIRED)
-        UUID jobId
+        @Schema(description = "Server-assigned Job ID", requiredMode = Schema.RequiredMode.REQUIRED) UUID jobId
 ) {}

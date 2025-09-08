@@ -18,4 +18,5 @@ public record JobRequestV1(
         JsonNode payload,
 
         @Schema(description = "Optional idempotency key to prevent duplicates", example = "email-2025-09-06-1234")
-        String idempotencyKey) {}
+        String idempotencyKey
+) {}

@@ -23,7 +23,7 @@ public class OpenApiConfig {
                     Async Task Queue with retries and compensation.
                     Endpoints to submit jobs, query status, and manage records.
                     """)
-                        .contact(new Contact().name("Platform Team").email("platform@example.com"))
+                        .contact(new Contact().name("Someone").email("someone@example.com"))
                         .license(new License().name("Proprietary")))
                 .servers(List.of(new Server().url("http://localhost:8080").description("Local")));
     }

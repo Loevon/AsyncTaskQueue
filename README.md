@@ -12,7 +12,7 @@ Job queue in Spring Boot that:
 
 ## Run
 
-To run this project first install Docker. Then navigate to the project via terminal and run the command:
+To run this project first install Docker and Java 24. Then navigate to the project via terminal and run the command:
 
 ```bash
 docker compose up db
@@ -38,11 +38,11 @@ http://localhost:8080/swagger-ui.html
 # Metrics
 Metrics are logged at these various endpoints here:
 
-http://127.0.0.1:8080/actuator/metrics/jobs.failed
-http://127.0.0.1:8080/actuator/metrics/jobs.submitted
-http://127.0.0.1:8080/actuator/metrics/jobs.succeeded
-http://127.0.0.1:8080/actuator/metrics/jobs.compensated
-http://127.0.0.1:8080/actuator/metrics/jobs.execution.timer
+- http://127.0.0.1:8080/actuator/metrics/jobs.failed
+- http://127.0.0.1:8080/actuator/metrics/jobs.submitted
+- http://127.0.0.1:8080/actuator/metrics/jobs.succeeded
+- http://127.0.0.1:8080/actuator/metrics/jobs.compensated
+- http://127.0.0.1:8080/actuator/metrics/jobs.execution.timer
 
 
 # Complexity

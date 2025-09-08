@@ -6,12 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.Instant;
 
 public record JobStatusResponseV1(
-
-       // JobStatus status, int attempts, String lastError, Instant startedAt, Instant completedAt
-
-        @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "QUEUED|RUNNING|SUCCEEDED|FAILED|COMPENSATED")
-        JobStatus status,
-
+        @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "QUEUED|RUNNING|SUCCEEDED|FAILED|COMPENSATED") JobStatus status,
         @Schema(requiredMode = Schema.RequiredMode.REQUIRED, example = "2") int attempts,
         @Schema(example = "SMTP 451 Temporary local problem") String lastError,
         @Schema(example = "2025-09-07T20:30:00Z") Instant startedAt,
