@@ -1,44 +1,65 @@
-# Read Me First
-The following was discovered as part of building this project:
+# Async Task Queue
 
-* No Docker Compose services found. As of now, the application won't start! Please add at least one service to the `compose.yaml` file.
+Job queue in Spring Boot that:
+- Accepts jobs via (`POST /v1/jobs`)
+- Provides job **status** via (`GET /v1/jobs/{jobId}`)
+- Retries with **exponential backoff and jitter**
+- Runs them concurrently using a fixed worker pool + **bounded** queue
+- When retries are exhausted, runs a **compensation** and marks the job as `COMPENSATED`
+- Supports **idempotency** via `idempotencyKey`
+- Produces **metrics** and emits **structured logs**
 
-# Getting Started
 
-### Reference Documentation
-For further reference, please consider the following sections:
+## Run
 
-* [Official Apache Maven documentation](https://maven.apache.org/guides/index.html)
-* [Spring Boot Maven Plugin Reference Guide](https://docs.spring.io/spring-boot/4.0.0-SNAPSHOT/maven-plugin)
-* [Create an OCI image](https://docs.spring.io/spring-boot/4.0.0-SNAPSHOT/maven-plugin/build-image.html)
-* [Docker Compose Support](https://docs.spring.io/spring-boot/4.0.0-SNAPSHOT/reference/features/dev-services.html#features.dev-services.docker-compose)
-* [Spring Boot DevTools](https://docs.spring.io/spring-boot/4.0.0-SNAPSHOT/reference/using/devtools.html)
-* [Spring Web](https://docs.spring.io/spring-boot/4.0.0-SNAPSHOT/reference/web/servlet.html)
-* [HTTP Client](https://docs.spring.io/spring-boot/4.0.0-SNAPSHOT/reference/io/rest-client.html#io.rest-client.restclient)
-* [Spring Session for JDBC](https://docs.spring.io/spring-session/reference/)
-* [Rest Repositories](https://docs.spring.io/spring-boot/4.0.0-SNAPSHOT/how-to/data-access.html#howto.data-access.exposing-spring-data-repositories-as-rest)
+To run this project first install Docker. Then navigate to the project via terminal and run the command:
 
-### Guides
-The following guides illustrate how to use some features concretely:
+```bash
+docker compose up db
+```
 
-* [Building a RESTful Web Service](https://spring.io/guides/gs/rest-service/)
-* [Serving Web Content with Spring MVC](https://spring.io/guides/gs/serving-web-content/)
-* [Building REST services with Spring](https://spring.io/guides/tutorials/rest/)
-* [Accessing JPA Data with REST](https://spring.io/guides/gs/accessing-data-rest/)
-* [Accessing Neo4j Data with REST](https://spring.io/guides/gs/accessing-neo4j-data-rest/)
-* [Accessing MongoDB Data with REST](https://spring.io/guides/gs/accessing-mongodb-data-rest/)
+Then start the Maven Spring Boot by either running the project in an IDE or run from terminal with:
 
-### Docker Compose support
-This project contains a Docker Compose file named `compose.yaml`.
+```bash
+mvn spring-boot:run
+```
 
-However, no services were found. As of now, the application won't start!
+# Testing
+To run the projects tests, run this command:
+```bash
+mvn test
+```
 
-Please make sure to add at least one service in the `compose.yaml` file.
+# OpenAPI
+Once the Spring Boot project loads, you can access the APIs using the following link in your web browser: 
 
-### Maven Parent overrides
+http://localhost:8080/swagger-ui.html
 
-Due to Maven's design, elements are inherited from the parent POM to the project POM.
-While most of the inheritance is fine, it also inherits unwanted elements like `<license>` and `<developers>` from the parent.
-To prevent this, the project POM contains empty overrides for these elements.
-If you manually switch to a different parent and actually want the inheritance, you need to remove those overrides.
+# Metrics
+Metrics are logged at these various endpoints here:
 
+http://127.0.0.1:8080/actuator/metrics/jobs.failed
+http://127.0.0.1:8080/actuator/metrics/jobs.submitted
+http://127.0.0.1:8080/actuator/metrics/jobs.succeeded
+http://127.0.0.1:8080/actuator/metrics/jobs.compensated
+http://127.0.0.1:8080/actuator/metrics/jobs.execution.timer
+
+
+# Complexity
+- Create: O(1) map checks + bounded O(1) enqueue is constant time
+- Get: Single database record lookup for a single record
+- Delete: Database record deletion
+
+# Assumptions
+- No info was given on the jobs that are run, so they are stubs that use delays to simulate work
+- If a job fails all of its retries, it will still be marked as compensated - possibly add a "COMPENSATED_FAILED" state?
+- 
+
+# What's next?
+This project is obviously a demo I put together for an assessment. If I were to continue with it, I would implement some of the following:
+
+- Better database credential storage, such as a secret manager via AWS
+- A more robust API result that better supports result data and exceptions
+- Add authentication to the APIs as they are all currently insecure
+- This is a singleton service. If more instances were spun up, would need to support a locking mechanism for a distributed database
+- There is no resume features if the application crashes or is taken down. This means all active tasks would be lost. Need a way to read database rows on server startup that continues execution
